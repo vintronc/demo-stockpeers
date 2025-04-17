@@ -109,32 +109,39 @@ STOCKS = [
 
 DEFAULT_STOCKS = ["AAPL", "MSFT", "GOOGL", "NVDA", "AMZN", "TSLA", "META"]
 
-if "stocks" not in st.session_state:
-    st.session_state.symbols_input = st.query_params.get(
-        "stocks", DEFAULT_STOCKS)
+
+def stocks_to_str(stocks):
+    return ",".join(stocks)
+
+
+if "tickers_input" not in st.session_state:
+    st.session_state.tickers_input = st.query_params.get(
+        "stocks", stocks_to_str(DEFAULT_STOCKS)
+    ).split(",")
 
 
 # Callback to update query param when input changes
 def update_query_param():
-    if st.session_state.symbols_input:
-        st.query_params["stocks"] = ",".join(st.session_state.symbols_input)
+    if st.session_state.tickers_input:
+        st.query_params["stocks"] = stocks_to_str(
+            st.session_state.tickers_input)
     else:
         st.query_params.pop("stocks", None)
 
 
-# Input for stock symbols
-symbols = st.multiselect(
+# Input for stock tickers
+tickers = st.multiselect(
     "Stock tickers",
-    options=STOCKS,
-    default=DEFAULT_STOCKS,
+    options=sorted(set(STOCKS) | set(st.session_state.tickers_input)),
+    default=st.session_state.tickers_input,
     accept_new_options=True,
 )
 
-symbols = [s.upper() for s in symbols]
+tickers = [t.upper() for t in tickers]
 
 # Update query param when text input changes
-if symbols:
-    st.query_params["stocks"] = ",".join(symbols)
+if tickers:
+    st.query_params["stocks"] = stocks_to_str(tickers)
 else:
     # Clear the param if input is empty
     st.query_params.pop("stocks", None)
@@ -157,17 +164,17 @@ horizon = st.segmented_control(
 
 
 @st.cache_data(show_spinner=False)
-def load_data(symbols, period):
+def load_data(tickers, period):
     data = pd.DataFrame()
-    for symbol in symbols:
-        stock = yf.Ticker(symbol)
+    for ticker in tickers:
+        stock = yf.Ticker(ticker)
         hist = stock.history(period=period)["Close"]
-        data[symbol] = hist
+        data[ticker] = hist
     return data
 
 
 # Load the data
-data = load_data(symbols, horizon_map[horizon])
+data = load_data(tickers, horizon_map[horizon])
 
 # Normalize prices (start at 1)
 normalized = data.div(data.iloc[0])
@@ -209,16 +216,16 @@ excludes X itself.
 
 tabs = st.tabs(["Delta", "Price"])
 
-for symbol in symbols:
+for ticker in tickers:
     # Calculate peer average (excluding current stock)
-    peers = normalized.drop(columns=[symbol])
+    peers = normalized.drop(columns=[ticker])
     peer_avg = peers.mean(axis=1)
 
     # Create Delta chart
     plot_data = pd.DataFrame(
         {
             "Date": normalized.index,
-            "Delta": normalized[symbol] - peer_avg,
+            "Delta": normalized[ticker] - peer_avg,
         }
     )
 
@@ -229,7 +236,7 @@ for symbol in symbols:
             x="Date:T",
             y="Delta:Q",
         )
-        .properties(title=f"{symbol} minus peer average", height=300)
+        .properties(title=f"{ticker} minus peer average", height=300)
     )
 
     tabs[0].write("")
@@ -239,7 +246,7 @@ for symbol in symbols:
     plot_data = pd.DataFrame(
         {
             "Date": normalized.index,
-            "Stock price": normalized[symbol],
+            "Stock price": normalized[ticker],
             "Peer average": peer_avg,
         }
     ).melt(id_vars=["Date"], var_name="Series", value_name="Price")
@@ -259,7 +266,7 @@ for symbol in symbols:
             ),
             tooltip=["Date", "Series", "Price"],
         )
-        .properties(title=f"{symbol} vs Peer average", height=300)
+        .properties(title=f"{ticker} vs Peer average", height=300)
     )
 
     tabs[1].write("")
