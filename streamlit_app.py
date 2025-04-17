@@ -3,8 +3,13 @@ import yfinance as yf
 import pandas as pd
 import altair as alt
 
+st.set_page_config(
+    page_title="Stock peer group analysis",
+    page_icon=":chart_with_upwards_trend:"
+)
+
 """
-# Stock peer group analysis
+# :chart_with_upwards_trend: Stock peer group analysis
 
 Easily compare stocks against others in their peer group.
 """
