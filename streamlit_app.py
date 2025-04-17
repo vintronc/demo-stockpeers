@@ -146,11 +146,15 @@ else:
     # Clear the param if input is empty
     st.query_params.pop("stocks", None)
 
+if not tickers:
+    st.stop()
+
 # Time horizon selector
 horizon_map = {
     "1 Week": "1wk",
     "1 Month": "1mo",
     "3 Months": "3mo",
+    "6 Months": "6mo",
     "1 Year": "1y",
     "5 Years": "5y",
     "10 Years": "10y",
@@ -163,7 +167,7 @@ horizon = st.segmented_control(
 )
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def load_data(tickers, period):
     data = pd.DataFrame()
     for ticker in tickers:
@@ -175,6 +179,10 @@ def load_data(tickers, period):
 
 # Load the data
 data = load_data(tickers, horizon_map[horizon])
+
+if not len(data):
+    st.error("No data")
+    st.stop()
 
 # Normalize prices (start at 1)
 normalized = data.div(data.iloc[0])
@@ -213,6 +221,10 @@ st.altair_chart(chart1, use_container_width=True)
 For the analysis below, the "peer average" when analyzing stock X always
 excludes X itself.
 """
+
+if len(tickers) <= 1:
+    st.warning("Pick 2 or more tickers to compare them")
+    st.stop()
 
 tabs = st.tabs(["Delta", "Price"])
 
