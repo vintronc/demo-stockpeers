@@ -210,7 +210,7 @@ st.altair_chart(chart1, use_container_width=True)
 """
 ### Individual stocks vs peer average
 
-For the analysis below, the "peer average" when anlyzing stock X always
+For the analysis below, the "peer average" when analyzing stock X always
 excludes X itself.
 """
 
