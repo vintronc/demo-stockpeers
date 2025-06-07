@@ -183,7 +183,12 @@ def load_data(tickers, period):
 
 
 # Load the data
-data = load_data(tickers, horizon_map[horizon])
+try:
+    data = load_data(tickers, horizon_map[horizon])
+except yf.exceptions.YFRateLimitError as e:
+    st.warning("YFinance is rate-limiting us :(\nTry again later.")
+    data = []
+    load_data.clear() # Remove the bad cache entry.
 
 if not len(data):
     st.error("No data")
