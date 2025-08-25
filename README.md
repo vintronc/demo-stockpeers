@@ -11,7 +11,7 @@ A Streamlit app where you can compare how different stocks fare against each oth
 1. Get the code:
 
    ```sh
-   $ git clone https://github.com/streamlit//demo-stockpeers.git
+   $ git clone https://github.com/streamlit/demo-stockpeers.git
    ```
 
 2. Start a virtual environment and get the dependencies (requires uv):
