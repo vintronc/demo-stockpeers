@@ -4,13 +4,13 @@ import pandas as pd
 import altair as alt
 
 st.set_page_config(
-    page_title="Stock peer group analysis",
+    page_title="Stock peer analysis dashboard",
     page_icon=":chart_with_upwards_trend:",
     layout="wide",
 )
 
 """
-# :chart_with_upwards_trend: Stock peer group analysis
+# :chart_with_upwards_trend: Stock peer analysis
 
 Easily compare stocks against others in their peer group.
 """
@@ -197,7 +197,7 @@ try:
 except yf.exceptions.YFRateLimitError as e:
     st.warning("YFinance is rate-limiting us :(\nTry again later.")
     data = []
-    load_data.clear() # Remove the bad cache entry.
+    load_data.clear()  # Remove the bad cache entry.
 
 if not len(data):
     st.error("No data")
