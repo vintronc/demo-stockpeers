@@ -166,7 +166,6 @@ if not tickers:
 
 # Time horizon selector
 horizon_map = {
-    "1 Month": "1mo",
     "6 Months": "6mo",
     "1 Year": "1y",
     "5 Years": "5y",
