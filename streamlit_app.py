@@ -141,7 +141,7 @@ controls = cols[0].container(border=True, height="stretch")
 
 with controls:
     """
-    #### Stocks to compare
+    ## Stocks to compare
     """
 
     # Input for stock tickers
@@ -209,7 +209,7 @@ normalized = data.div(data.iloc[0])
 # Plot 1: Normalized prices
 with cols[1].container(border=True):
     """
-    #### Normalized price
+    ## Normalized price
     """
 
     chart1 = (
@@ -233,15 +233,11 @@ with cols[1].container(border=True):
 
 # Plot individual stock vs peer average
 """
-#### Individual stocks vs peer average
-"""
+## Individual stocks vs peer average
 
-st.caption(
-    """
-    For the analysis below, the "peer average" when analyzing stock X always
-    excludes X itself.
-    """
-)
+For the analysis below, the "peer average" when analyzing stock X always
+excludes X itself.
+"""
 
 if len(tickers) <= 1:
     st.warning("Pick 2 or more tickers to compare them")
@@ -315,7 +311,7 @@ for i, ticker in enumerate(tickers):
 ""
 
 """
-#### Raw data
+## Raw data
 """
 
 data
