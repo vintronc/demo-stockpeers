@@ -233,7 +233,7 @@ with right_cell:
         .mark_line()
         .encode(
             alt.X("Date:T"),
-            alt.Y("Normalized price:Q", scale=alt.Scale(zero=False)),
+            alt.Y("Normalized price:Q").scale(zero=False),
             alt.Color("Stock:N"),
         )
         .properties(height=400)
@@ -274,8 +274,8 @@ for i, ticker in enumerate(tickers):
         alt.Chart(plot_data)
         .mark_area()
         .encode(
-            x="Date:T",
-            y="Delta:Q",
+            alt.X("Date:T"),
+            alt.Y("Delta:Q").scale(zero=False),
         )
         .properties(title=f"{ticker} minus peer average", height=300)
     )
@@ -297,9 +297,9 @@ for i, ticker in enumerate(tickers):
         alt.Chart(plot_data)
         .mark_line()
         .encode(
-            x="Date:T",
-            y="Price:Q",
-            color=alt.Color(
+            alt.X("Date:T"),
+            alt.Y("Price:Q").scale(zero=False),
+            alt.Color(
                 "Series:N",
                 scale=alt.Scale(
                     domain=["Stock price", "Peer average"], range=["red", "gray"]
