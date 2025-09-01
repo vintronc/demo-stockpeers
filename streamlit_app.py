@@ -136,21 +136,30 @@ def update_query_param():
         st.query_params.pop("stocks", None)
 
 
-cols = st.columns([1, 2])
-controls = cols[0].container(border=True, height="stretch")
+# Time horizon selector
+horizon_map = {
+    "1 Months": "1mo",
+    "3 Months": "3mo",
+    "6 Months": "6mo",
+    "1 Year": "1y",
+    "5 Years": "5y",
+    "10 Years": "10y",
+    "20 Years": "20y",
+}
 
-with controls:
-    """
-    ## Stocks to compare
-    """
+horizon = st.pills(
+    "Time horizon",
+    options=list(horizon_map.keys()),
+    default="6 Months",
+)
 
-    # Input for stock tickers
-    tickers = st.multiselect(
-        "Stock tickers",
-        options=sorted(set(STOCKS) | set(st.session_state.tickers_input)),
-        default=st.session_state.tickers_input,
-        accept_new_options=True,
-    )
+# Input for stock tickers
+tickers = st.multiselect(
+    "Stock tickers",
+    options=sorted(set(STOCKS) | set(st.session_state.tickers_input)),
+    default=st.session_state.tickers_input,
+    accept_new_options=True,
+)
 
 tickers = [t.upper() for t in tickers]
 
@@ -163,22 +172,6 @@ else:
 
 if not tickers:
     st.stop()
-
-# Time horizon selector
-horizon_map = {
-    "6 Months": "6mo",
-    "1 Year": "1y",
-    "5 Years": "5y",
-    "10 Years": "10y",
-}
-
-with controls:
-    horizon = st.segmented_control(
-        "Time horizon",
-        options=list(horizon_map.keys()),
-        default="6 Months",
-        width="stretch",
-    )
 
 
 @st.cache_resource(show_spinner=False)
@@ -207,7 +200,7 @@ normalized = data.div(data.iloc[0])
 
 
 # Plot 1: Normalized prices
-with cols[1].container(border=True):
+with st.container(border=True):
     """
     ## Normalized price
     """
@@ -243,10 +236,8 @@ if len(tickers) <= 1:
     st.warning("Pick 2 or more tickers to compare them")
     st.stop()
 
-tabs = st.tabs(["Delta", "Price"])
-
-NUM_COLS = 3
-tab_cols = [tab.columns(NUM_COLS) for tab in tabs]
+NUM_COLS = 4
+cols = st.columns(NUM_COLS)
 
 for i, ticker in enumerate(tickers):
     # Calculate peer average (excluding current stock)
@@ -271,8 +262,7 @@ for i, ticker in enumerate(tickers):
         .properties(title=f"{ticker} minus peer average", height=300)
     )
 
-    cell_num = i % NUM_COLS
-    cell = tab_cols[0][cell_num].container(border=True)
+    cell = cols[(i * 2) % NUM_COLS].container(border=True)
     cell.write("")
     cell.altair_chart(chart, use_container_width=True)
 
@@ -303,7 +293,7 @@ for i, ticker in enumerate(tickers):
         .properties(title=f"{ticker} vs Peer average", height=300)
     )
 
-    cell = tab_cols[1][cell_num].container(border=True)
+    cell = cols[(i * 2 + 1) % NUM_COLS].container(border=True)
     cell.write("")
     cell.altair_chart(chart, use_container_width=True)
 
