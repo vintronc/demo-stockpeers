@@ -19,7 +19,7 @@ Easily compare stocks against others in their peer group.
 
 cols = st.columns([1, 3])
 left_cell = cols[0].container(border=True, height="stretch")
-right_cell = cols[1].container(border=True, height="stretch")
+# Will declare right cell later to avoid showing it when no data.
 
 STOCKS = [
     "AAPL",
@@ -146,6 +146,7 @@ with left_cell:
         "Stock tickers",
         options=sorted(set(STOCKS) | set(st.session_state.tickers_input)),
         default=st.session_state.tickers_input,
+        placeholder="Choose stocks to compare. Example: NVDA",
         accept_new_options=True,
     )
 
@@ -178,7 +179,11 @@ else:
     st.query_params.pop("stocks", None)
 
 if not tickers:
+    left_cell.info("Pick some stocks to compare", icon=":material/info:")
     st.stop()
+
+
+right_cell = cols[1].container(border=True, height="stretch")
 
 
 @st.cache_resource(show_spinner=False)
@@ -227,9 +232,9 @@ with right_cell:
         )
         .mark_line()
         .encode(
-            x="Date:T",
-            y="Normalized price:Q",
-            color=alt.Color("Stock:N", legend=alt.Legend(orient="bottom")),
+            alt.X("Date:T"),
+            alt.Y("Normalized price:Q", scale=alt.Scale(zero=False)),
+            alt.Color("Stock:N"),
         )
         .properties(height=400)
     )
