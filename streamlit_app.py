@@ -17,6 +17,10 @@ Easily compare stocks against others in their peer group.
 
 ""  # Add some space.
 
+cols = st.columns([1, 3])
+left_cell = cols[0].container(border=True, height="stretch")
+right_cell = cols[1].container(border=True, height="stretch")
+
 STOCKS = [
     "AAPL",
     "ABBV",
@@ -136,6 +140,15 @@ def update_query_param():
         st.query_params.pop("stocks", None)
 
 
+with left_cell:
+    # Selectbox for stock tickers
+    tickers = st.multiselect(
+        "Stock tickers",
+        options=sorted(set(STOCKS) | set(st.session_state.tickers_input)),
+        default=st.session_state.tickers_input,
+        accept_new_options=True,
+    )
+
 # Time horizon selector
 horizon_map = {
     "1 Months": "1mo",
@@ -147,19 +160,13 @@ horizon_map = {
     "20 Years": "20y",
 }
 
-horizon = st.pills(
-    "Time horizon",
-    options=list(horizon_map.keys()),
-    default="6 Months",
-)
-
-# Input for stock tickers
-tickers = st.multiselect(
-    "Stock tickers",
-    options=sorted(set(STOCKS) | set(st.session_state.tickers_input)),
-    default=st.session_state.tickers_input,
-    accept_new_options=True,
-)
+with left_cell:
+    # Buttons for picking time horizon
+    horizon = st.pills(
+        "Time horizon",
+        options=list(horizon_map.keys()),
+        default="6 Months",
+    )
 
 tickers = [t.upper() for t in tickers]
 
@@ -198,14 +205,21 @@ if not len(data):
 # Normalize prices (start at 1)
 normalized = data.div(data.iloc[0])
 
+latest_norm_values = {normalized[ticker].iat[-1]: ticker for ticker in tickers}
+max_norm_value = max(latest_norm_values.items())
+min_norm_value = min(latest_norm_values.items())
 
-# Plot 1: Normalized prices
-with st.container(border=True):
-    """
-    ## Normalized price
-    """
+with left_cell:
+    ""  # Add a little space
+    ""  # Add a little space
+    cols = st.columns(2)
+    cols[0].metric("Best stock", max_norm_value[1], delta=f"{max_norm_value[0]:.3f}")
+    cols[1].metric("Worst stock", min_norm_value[1], delta=f"{min_norm_value[0]:.3f}")
 
-    chart1 = (
+
+# Plot normalized prices
+with right_cell:
+    st.altair_chart(
         alt.Chart(
             normalized.reset_index().melt(
                 id_vars=["Date"], var_name="Stock", value_name="Normalized price"
@@ -217,9 +231,8 @@ with st.container(border=True):
             y="Normalized price:Q",
             color=alt.Color("Stock:N", legend=alt.Legend(orient="bottom")),
         )
+        .properties(height=400)
     )
-
-    st.altair_chart(chart1, use_container_width=True)
 
 ""
 ""
