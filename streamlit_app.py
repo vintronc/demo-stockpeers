@@ -18,7 +18,6 @@ Easily compare stocks against others in their peer group.
 ""  # Add some space.
 
 cols = st.columns([1, 3])
-left_cell = cols[0].container(border=True, height="stretch")
 # Will declare right cell later to avoid showing it when no data.
 
 STOCKS = [
@@ -140,7 +139,11 @@ def update_query_param():
         st.query_params.pop("stocks", None)
 
 
-with left_cell:
+top_left_cell = cols[0].container(
+    border=True, height="stretch", vertical_alignment="center"
+)
+
+with top_left_cell:
     # Selectbox for stock tickers
     tickers = st.multiselect(
         "Stock tickers",
@@ -161,7 +164,7 @@ horizon_map = {
     "20 Years": "20y",
 }
 
-with left_cell:
+with top_left_cell:
     # Buttons for picking time horizon
     horizon = st.pills(
         "Time horizon",
@@ -179,11 +182,13 @@ else:
     st.query_params.pop("stocks", None)
 
 if not tickers:
-    left_cell.info("Pick some stocks to compare", icon=":material/info:")
+    top_left_cell.info("Pick some stocks to compare", icon=":material/info:")
     st.stop()
 
 
-right_cell = cols[1].container(border=True, height="stretch")
+right_cell = cols[1].container(
+    border=True, height="stretch", vertical_alignment="center"
+)
 
 
 @st.cache_resource(show_spinner=False)
@@ -214,9 +219,11 @@ latest_norm_values = {normalized[ticker].iat[-1]: ticker for ticker in tickers}
 max_norm_value = max(latest_norm_values.items())
 min_norm_value = min(latest_norm_values.items())
 
-with left_cell:
-    ""  # Add a little space
-    ""  # Add a little space
+bottom_left_cell = cols[0].container(
+    border=True, height="stretch", vertical_alignment="center"
+)
+
+with bottom_left_cell:
     cols = st.columns(2)
     cols[0].metric(
         "Best stock", max_norm_value[1], delta=f"{round(max_norm_value[0] * 100)}%"
