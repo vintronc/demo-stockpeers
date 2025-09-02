@@ -299,7 +299,7 @@ for i, ticker in enumerate(tickers):
     plot_data = pd.DataFrame(
         {
             "Date": normalized.index,
-            "Stock price": normalized[ticker],
+            ticker: normalized[ticker],
             "Peer average": peer_avg,
         }
     ).melt(id_vars=["Date"], var_name="Series", value_name="Price")
@@ -312,12 +312,10 @@ for i, ticker in enumerate(tickers):
             alt.Y("Price:Q").scale(zero=False),
             alt.Color(
                 "Series:N",
-                scale=alt.Scale(
-                    domain=["Stock price", "Peer average"], range=["red", "gray"]
-                ),
+                scale=alt.Scale(domain=[ticker, "Peer average"], range=["red", "gray"]),
                 legend=alt.Legend(orient="bottom"),
             ),
-            tooltip=["Date", "Series", "Price"],
+            alt.Tooltip(["Date", "Series", "Price"]),
         )
         .properties(title=f"{ticker} vs Peer average", height=300)
     )
