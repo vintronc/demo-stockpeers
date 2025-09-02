@@ -10,7 +10,7 @@ st.set_page_config(
 )
 
 """
-# :chart_with_upwards_trend: Stock peer analysis
+# :material/query_stats: Stock peer analysis
 
 Easily compare stocks against others in their peer group.
 """
