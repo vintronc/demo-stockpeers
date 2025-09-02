@@ -218,8 +218,12 @@ with left_cell:
     ""  # Add a little space
     ""  # Add a little space
     cols = st.columns(2)
-    cols[0].metric("Best stock", max_norm_value[1], delta=f"{max_norm_value[0]:.3f}")
-    cols[1].metric("Worst stock", min_norm_value[1], delta=f"{min_norm_value[0]:.3f}")
+    cols[0].metric(
+        "Best stock", max_norm_value[1], delta=f"{round(max_norm_value[0] * 100)}%"
+    )
+    cols[1].metric(
+        "Worst stock", min_norm_value[1], delta=f"{round(min_norm_value[0] * 100)}%"
+    )
 
 
 # Plot normalized prices
