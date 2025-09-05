@@ -294,28 +294,6 @@ for i, ticker in enumerate(tickers):
     peers = normalized.drop(columns=[ticker])
     peer_avg = peers.mean(axis=1)
 
-    # Create Delta chart
-    plot_data = pd.DataFrame(
-        {
-            "Date": normalized.index,
-            "Delta": normalized[ticker] - peer_avg,
-        }
-    )
-
-    chart = (
-        alt.Chart(plot_data)
-        .mark_area()
-        .encode(
-            alt.X("Date:T"),
-            alt.Y("Delta:Q").scale(zero=False),
-        )
-        .properties(title=f"{ticker} minus peer average", height=300)
-    )
-
-    cell = cols[(i * 2) % NUM_COLS].container(border=True)
-    cell.write("")
-    cell.altair_chart(chart, use_container_width=True)
-
     # Create DataFrame with peer average.
     plot_data = pd.DataFrame(
         {
@@ -338,7 +316,29 @@ for i, ticker in enumerate(tickers):
             ),
             alt.Tooltip(["Date", "Series", "Price"]),
         )
-        .properties(title=f"{ticker} vs Peer average", height=300)
+        .properties(title=f"{ticker} vs peer average", height=300)
+    )
+
+    cell = cols[(i * 2) % NUM_COLS].container(border=True)
+    cell.write("")
+    cell.altair_chart(chart, use_container_width=True)
+
+    # Create Delta chart
+    plot_data = pd.DataFrame(
+        {
+            "Date": normalized.index,
+            "Delta": normalized[ticker] - peer_avg,
+        }
+    )
+
+    chart = (
+        alt.Chart(plot_data)
+        .mark_area()
+        .encode(
+            alt.X("Date:T"),
+            alt.Y("Delta:Q").scale(zero=False),
+        )
+        .properties(title=f"{ticker} minus peer average", height=300)
     )
 
     cell = cols[(i * 2 + 1) % NUM_COLS].container(border=True)
