@@ -220,11 +220,13 @@ try:
     data = load_data(tickers, horizon_map[horizon])
 except yf.exceptions.YFRateLimitError as e:
     st.warning("YFinance is rate-limiting us :(\nTry again later.")
-    data = []
     load_data.clear()  # Remove the bad cache entry.
+    st.stop()
 
-if not len(data):
-    st.error("No data")
+empty_columns = data.columns[data.isna().all()].tolist()
+
+if empty_columns:
+    st.error(f"Error loading data for the tickers: {', '.join(empty_columns)}.")
     st.stop()
 
 # Normalize prices (start at 1)
