@@ -7,6 +7,6 @@ requires-python = ">=3.10"
 dependencies = [
     "altair>=5.5.0",
     "pandas>=2.2.3",
-    "streamlit-nightly>=1.44.2.dev20250415",
+    "streamlit>=1.44.2",
     "yfinance>=0.2.55",
 ]
